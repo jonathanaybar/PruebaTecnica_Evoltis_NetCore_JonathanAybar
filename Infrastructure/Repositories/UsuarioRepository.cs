@@ -18,24 +18,24 @@ namespace Infrastructure.Repositories
 
         public async Task<List<Usuario>> Search(string? nombre, string? provincia, string? ciudad, CancellationToken ct = default)
         {
-            var q = _ctx.Set<Usuario>()                 
-                .Include(u => u.Domicilios)
-                .AsNoTracking()                         
-                .AsQueryable();
+            var query = _ctx.Set<Infrastructure.Models.usuario>()
+                           .Include(u => u.domicilios)
+                           .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(nombre))
-                q = q.Where(u => u.Nombre != null && EF.Functions.Like(u.Nombre, $"%{nombre}%"));
+                query = query.Where(u => EF.Functions.Like(u.Nombre!, $"%{nombre}%"));
 
             if (!string.IsNullOrWhiteSpace(provincia))
-                q = q.Where(u => u.Domicilios.Any(d => d.Provincia == provincia));
+                query = query.Where(u => u.domicilios.Any(d => d.Provincia != null &&
+                                                               EF.Functions.Like(d.Provincia, $"%{provincia}%")));
 
             if (!string.IsNullOrWhiteSpace(ciudad))
-                q = q.Where(u => u.Domicilios.Any(d => d.Ciudad == ciudad));
+                query = query.Where(u => u.domicilios.Any(d => d.Ciudad != null &&
+                                                               EF.Functions.Like(d.Ciudad, $"%{ciudad}%")));
 
-            return await q.OrderBy(u => u.Nombre).ToListAsync(ct); 
+            var models = await query.ToListAsync(ct);
+            return _mapper.Map<List<Usuario>>(models);
         }
-
-
     }
 }
 

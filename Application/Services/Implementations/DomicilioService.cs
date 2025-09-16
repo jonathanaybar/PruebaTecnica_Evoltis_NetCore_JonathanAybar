@@ -43,13 +43,19 @@ namespace Application.Services.Implementations
 
         public async Task<DomicilioResponseDto?> UpdateAsync(int id, DomicilioUpdateRequestDto request, CancellationToken ct = default)
         {
-            var dom = await _repo.Get(id, ct);
-            if (dom == null) return null;
+            var current = await _repo.Get(id, ct);
+            if (current is null) return null;
 
-            _mapper.Map(request, dom);
-            var updated = await _repo.Update(dom, ct);
-            return _mapper.Map<DomicilioResponseDto>(updated);
+            current.Calle = request.Calle;
+            current.Numero = request.Numero;
+            current.Ciudad = request.Ciudad;
+            current.Provincia = request.Provincia;
+
+            await _repo.Update(current, ct);
+
+            return _mapper.Map<DomicilioResponseDto>(current);
         }
+
 
         public async Task<bool> DeleteAsync(int id, CancellationToken ct = default)
         {

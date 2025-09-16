@@ -40,13 +40,46 @@ namespace Application.Services.Implementations
 
         public async Task<UsuarioResponseDto?> UpdateAsync(int id, UsuarioUpdateRequestDto request, CancellationToken ct = default)
         {
-            var usuario = await _repo.Get(id, ct);
-            if (usuario == null) return null;
+            var user = await _repo.Get(id, ct);
+            if (user is null) return null;
 
-            _mapper.Map(request, usuario);
-            var updated = await _repo.Update(usuario, ct);
-            return _mapper.Map<UsuarioResponseDto>(updated);
+            user.Nombre = request.Nombre;
+            user.Email = request.Email;
+
+            if (request.Domicilios != null)
+            {
+                // Editar/agregar sin cambiar UsuarioId en existentes
+                foreach (var d in request.Domicilios)
+                {
+                    if (d.Id == 0)
+                    {
+                        user.Domicilios.Add(new Domain.Entities.Domicilio
+                        {
+                            Calle = d.Calle,
+                            Numero = d.Numero,
+                            Ciudad = d.Ciudad,
+                            Provincia = d.Provincia,
+                            UsuarioId = user.Id
+                        });
+                    }
+                    else
+                    {
+                        var existing = user.Domicilios.FirstOrDefault(x => x.Id == d.Id);
+                        if (existing != null)
+                        {
+                            existing.Calle = d.Calle;
+                            existing.Numero = d.Numero;
+                            existing.Ciudad = d.Ciudad;
+                            existing.Provincia = d.Provincia;
+                        }
+                    }
+                }
+            }
+
+            await _repo.Update(user, ct);
+            return _mapper.Map<UsuarioResponseDto>(user);
         }
+
 
         public async Task<bool> DeleteAsync(int id, CancellationToken ct = default)
         {

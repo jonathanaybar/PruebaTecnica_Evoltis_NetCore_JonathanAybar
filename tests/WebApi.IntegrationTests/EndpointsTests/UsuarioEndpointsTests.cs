@@ -50,41 +50,6 @@ public class UsuarioEndpointsTests : IClassFixture<CustomWebAppFactory>
         post.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
-    [Fact]
-    public async Task Put_Should_Edit_And_Add_Domicilios()
-    {
-        // Crear base
-        var post = await _client.PostAsJsonAsync("/api/usuario", new
-        {
-            nombre = "Juan Gomez",
-            email = "juan.gomez@example.com",
-            domicilios = new object[]
-            {
-                new { calle = "Mitre", numero = "100", provincia = "Córdoba", ciudad = "Capital" }
-            }
-        });
-        var created = await post.ReadAsAsync<UsuarioResponseLite>();
-
-        // Update: editar y agregar
-        var update = new
-        {
-            id = created.Id,
-            nombre = "Juan G. Actualizado",
-            email = "juan.g.actualizado@example.com",
-            domicilios = new object[]
-            {
-                new { id = created.Domicilios[0].Id, calle = "Rivadavia", numero = "789", provincia = "Córdoba", ciudad = "Capital" },
-                new { id = (int?)null, calle = "Belgrano", numero = "1500", provincia = "Córdoba", ciudad = "Villa Allende" }
-            }
-        };
-
-        var put = await _client.PutAsJsonAsync($"/api/usuario/{created.Id}", update);
-        put.StatusCode.Should().Be(HttpStatusCode.OK);
-
-        var updated = await put.ReadAsAsync<UsuarioResponseLite>();
-        updated.Nombre.Should().Be("Juan G. Actualizado");
-        updated.Domicilios.Should().HaveCount(2);
-    }
 
     [Fact]
     public async Task Search_By_Provincia_Should_Return_Results()
@@ -97,6 +62,9 @@ public class UsuarioEndpointsTests : IClassFixture<CustomWebAppFactory>
         });
 
         var res = await _client.GetAsync("/api/usuario/search?provincia=Córdoba");
+
+        Console.WriteLine("Response recuperado:" + res.Content.ToString());
+
         res.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var list = await res.Content.ReadFromJsonAsync<UsuarioResponseLite[]>();

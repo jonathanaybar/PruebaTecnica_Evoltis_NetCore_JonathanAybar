@@ -1,15 +1,16 @@
-﻿using Domain.Entities;
-using Domain.Interfaces;
-using Infrastructure.Repositories;
-using Microsoft.AspNetCore.Mvc;
+﻿using Application.DTOs;
+using Application.DTOs.Domicilio;
+using Application.Services.Interfaces;     
+using FluentValidation;
 
-namespace WebApi.Controllers
+public class DomicilioController
+  : BaseController<DomicilioCreateRequestDto, DomicilioUpdateRequestDto, DomicilioResponseDto, int>
 {
-    [ApiController]
-    public class DomicilioController : BaseController<Domicilio,IDomicilioRepository>
-    {
-        public DomicilioController(IDomicilioRepository repository) : base(repository)
-        { 
-        }
-    }
+    public DomicilioController(
+        IDomicilioService service,
+        IValidator<DomicilioCreateRequestDto> createValidator,
+        IValidator<DomicilioUpdateRequestDto> updateValidator
+    ) : base(service, createValidator, updateValidator)
+    { }
 }
+

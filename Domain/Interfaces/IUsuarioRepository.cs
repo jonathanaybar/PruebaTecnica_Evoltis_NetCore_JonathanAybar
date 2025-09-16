@@ -9,7 +9,7 @@ namespace Domain.Interfaces
 {
     public interface IUsuarioRepository : IRepository<Usuario>
     {
-        Task<IEnumerable<Usuario>> BuscarPorNombre(string nombre, CancellationToken ct = default);
-        Task<Usuario?> GetConDomicilios(int id, CancellationToken ct = default);
+        Task<List<Usuario>> Search(string? nombre, string? provincia, string? ciudad, CancellationToken ct = default);
+
     }
 }

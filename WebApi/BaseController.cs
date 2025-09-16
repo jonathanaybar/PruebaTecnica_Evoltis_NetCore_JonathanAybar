@@ -1,78 +1,69 @@
-﻿using Domain;
-using Infrastructure;
+﻿using Application.DTOs;
+using Application.Services;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using WebApi.Swagger;
 
-//Controller base generico
-namespace WebApi
+[ApiController]
+[Route("api/[controller]")]
+public class BaseController<TCreate, TUpdate, TRead, TKey> : ControllerBase
+    where TRead : IHasId<TKey>
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    [ApiConventionType(typeof(GenericApiConventions))]
+    private readonly IServiceBase<TCreate, TUpdate, TRead, TKey> _service;
+    private readonly IValidator<TCreate>? _createValidator;
+    private readonly IValidator<TUpdate>? _updateValidator;
 
-    public abstract class BaseController<TEntity, TRepository> : ControllerBase
-       where TEntity : class, IEntity
-       where TRepository : IRepository<TEntity>
+    public BaseController(
+        IServiceBase<TCreate, TUpdate, TRead, TKey> service,
+        IValidator<TCreate>? createValidator = null,
+        IValidator<TUpdate>? updateValidator = null)
     {
-        private readonly TRepository _repository;
+        _service = service;
+        _createValidator = createValidator;
+        _updateValidator = updateValidator;
+    }
 
-        protected BaseController(TRepository repository)
+    [HttpPost]
+    public virtual async Task<ActionResult<TRead>> Create([FromBody] TCreate dto, CancellationToken ct)
+    {
+        if (_createValidator is not null)
         {
-            _repository = repository;
+            var v = await _createValidator.ValidateAsync(dto, ct);
         }
 
-        // GET: api/[controller]
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<TEntity>>> GetAllAsync()
+        var created = await _service.CreateAsync(dto, ct);
+        return CreatedAtRoute(nameof(GetById), new { id = created.Id }, created);
+    }
+
+    [HttpGet("{id}")]
+    public virtual async Task<ActionResult<TRead>> GetById([FromRoute] TKey id, CancellationToken ct)
+    {
+        var r = await _service.GetByIdAsync(id, ct);
+        return r is null ? NotFound() : Ok(r);
+    }
+
+    [HttpGet]
+    public virtual async Task<ActionResult<List<TRead>>> GetAll(CancellationToken ct)
+    {
+        var items = await _service.GetAllAsync(ct);
+        return Ok(items);
+    }
+
+    [HttpPut("{id}")]
+    public virtual async Task<ActionResult<TRead>> Update([FromRoute] TKey id, [FromBody] TUpdate dto, CancellationToken ct)
+    {
+        if (_updateValidator is not null)
         {
-            var entities = await _repository.GetAll();
-            return Ok(entities);
+            var v = await _updateValidator.ValidateAsync(dto, ct);
         }
 
-        // GET: api/[controller]/{id}
-        [HttpGet("{id}")]
-        public async Task<ActionResult<TEntity>> GetByIdAsync(int id)
-        {
-            var entity = await _repository.Get(id);
-            if (entity == null)
-                return NotFound();
+        var r = await _service.UpdateAsync(id, dto, ct);
+        return r is null ? NotFound() : Ok(r);
+    }
 
-            return Ok(entity);
-        }
-
-        // POST: api/[controller]
-        [HttpPost]
-        public async Task<ActionResult<TEntity>> CreateAsync(TEntity entity)
-        {
-            var created = await _repository.Add(entity);
-
-            var id = ((IEntity)created).Id;
-
-            var controller = ControllerContext.ActionDescriptor.ControllerName.ToLowerInvariant();
-
-            return Created($"/api/{controller}/{id}", created);
-        }
-
-        // PUT: api/[controller]/{id}
-        [HttpPut("{id}")]
-        public async Task<ActionResult<TEntity>> UpdateAsync(int id, TEntity entity)
-        {
-            if ((entity as IEntity)?.Id != id)
-                return BadRequest("ID mismatch");
-
-            var updated = await _repository.Update(entity);
-            return Ok(updated);
-        }
-
-        // DELETE: api/[controller]/{id}
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<TEntity>> DeleteAsync(int id)
-        {
-            var deleted = await _repository.Delete(id);
-            if (deleted == null)
-                return NotFound();
-
-            return Ok(deleted);
-        }
+    [HttpDelete("{id}")]
+    public virtual async Task<IActionResult> Delete([FromRoute] TKey id, CancellationToken ct)
+    {
+        var ok = await _service.DeleteAsync(id, ct);
+        return ok ? NoContent() : NotFound();
     }
 }

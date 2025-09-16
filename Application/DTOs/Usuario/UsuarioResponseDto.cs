@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.DTOs.Usuario
 {
-    public record class UsuarioResponseDto
+    public record class UsuarioResponseDto : IHasId<int>
     {
         public int Id { get; init; }
         public string Nombre { get; init; } = string.Empty;

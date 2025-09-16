@@ -15,8 +15,9 @@ namespace Application.DTOs.Usuario
         public List<Domicilio.DomicilioCreateRequestDto>? Domicilios { get; init; }
     }
 
-    public record class UsuarioUpdateRequestDto
+    public record class UsuarioUpdateRequestDto : IHasId<int>
     {
+        public int Id { get; init; }
         public string Nombre { get; init; } = string.Empty;
         public string Email { get; init; } = string.Empty;
 

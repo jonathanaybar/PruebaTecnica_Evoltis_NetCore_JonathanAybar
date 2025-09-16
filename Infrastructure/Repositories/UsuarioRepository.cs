@@ -16,24 +16,24 @@ namespace Infrastructure.Repositories
         {
         }
 
-        // Ejemplo: buscar por nombre
-        public async Task<IEnumerable<Usuario>> BuscarPorNombre(string nombre, CancellationToken ct = default)
+        public async Task<List<Usuario>> Search(string? nombre, string? provincia, string? ciudad, CancellationToken ct = default)
         {
-            return await _ctx.usuarios
-                .Where(u => u.Nombre.Contains(nombre))
-                .ProjectTo<Usuario>(_mapper.ConfigurationProvider)
-                .ToListAsync(ct);
-        }
-
-        // Ejemplo: incluir domicilios
-        public async Task<Usuario?> GetConDomicilios(int id, CancellationToken ct = default)
-        {
-            var entity = await _ctx.usuarios
+            var q = _ctx.usuarios
                 .Include(u => u.Domicilios)
-                .FirstOrDefaultAsync(u => u.Id == id, ct);
+                .AsQueryable();
 
-            return _mapper.Map<Usuario>(entity);
+            if (!string.IsNullOrWhiteSpace(nombre))
+                q = q.Where(u => u.Nombre != null && EF.Functions.Like(u.Nombre, $"%{nombre}%"));
+
+            if (!string.IsNullOrWhiteSpace(provincia))
+                q = q.Where(u => u.Domicilios.Any(d => d.Provincia == provincia));
+
+            if (!string.IsNullOrWhiteSpace(ciudad))
+                q = q.Where(u => u.Domicilios.Any(d => d.Ciudad == ciudad));
+
+            return await q.OrderBy(u => u.Nombre).ToListAsync(ct);
         }
+
     }
 }
 

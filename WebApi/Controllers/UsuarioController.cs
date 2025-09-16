@@ -1,15 +1,35 @@
-﻿using Domain.Entities;
-using Domain.Interfaces;
-using Infrastructure.Repositories;
+﻿// /WebApi/Controllers/UsuarioController.cs
+using Application.DTOs;
+using Application.DTOs.Usuario;
+using Application.Services.Interfaces; // tu IUsuarioService
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
-namespace WebApi.Controllers
+[ApiController]
+[Route("api/[controller]")]
+public class UsuarioController
+  : BaseController<UsuarioCreateRequestDto, UsuarioUpdateRequestDto, UsuarioResponseDto, int>
 {
-    [ApiController]
-    public class UsuarioController : BaseController<Usuario, IUsuarioRepository>
+    private readonly IUsuarioService _usuarioService;
+
+    public UsuarioController(
+        IUsuarioService usuarioService,
+        IValidator<UsuarioCreateRequestDto> createValidator,
+        IValidator<UsuarioUpdateRequestDto> updateValidator
+    ) : base(usuarioService, createValidator, updateValidator)
     {
-        public UsuarioController(IUsuarioRepository repository) : base(repository)
-        { 
-        }
+        _usuarioService = usuarioService;
+    }
+
+    // GET api/usuario/search?nombre=&provincia=&ciudad=
+    [HttpGet("search")]
+    public async Task<ActionResult<List<UsuarioResponseDto>>> Search(
+        [FromQuery] string? nombre,
+        [FromQuery] string? provincia,
+        [FromQuery] string? ciudad,
+        CancellationToken ct)
+    {
+        var r = await _usuarioService.SearchAsync(nombre, provincia, ciudad, ct);
+        return Ok(r);
     }
 }

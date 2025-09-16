@@ -53,6 +53,18 @@ namespace Application.Services.Implementations
             var deleted = await _repo.Delete(id, ct);
             return deleted != null;
         }
+
+        public async Task<List<UsuarioResponseDto>> SearchAsync(string? nombre, string? provincia, string? ciudad, CancellationToken ct = default)
+        {
+            var usuarios = await _repo.Search(
+                string.IsNullOrWhiteSpace(nombre) ? null : nombre,
+                string.IsNullOrWhiteSpace(provincia) ? null : provincia,
+                string.IsNullOrWhiteSpace(ciudad) ? null : ciudad,
+                ct);
+
+            return _mapper.Map<List<UsuarioResponseDto>>(usuarios);
+        }
+
     }
 }
 

@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Domicilio;
+using Application.DTOs.Usuario;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,12 +8,8 @@ using System.Threading.Tasks;
 
 namespace Application.Services.Interfaces
 {
-    public interface IDomicilioService
+    public interface IDomicilioService : IServiceBase<DomicilioCreateRequestDto, DomicilioUpdateRequestDto, DomicilioResponseDto, int>
+
     {
-        Task<DomicilioResponseDto?> GetByIdAsync(int id, CancellationToken ct = default);
-        Task<List<DomicilioResponseDto>> GetAllAsync(CancellationToken ct = default);
-        Task<DomicilioResponseDto> CreateAsync(DomicilioCreateRequestDto request, CancellationToken ct = default);
-        Task<DomicilioResponseDto?> UpdateAsync(int id, DomicilioUpdateRequestDto request, CancellationToken ct = default);
-        Task<bool> DeleteAsync(int id, CancellationToken ct = default);
     }
 }

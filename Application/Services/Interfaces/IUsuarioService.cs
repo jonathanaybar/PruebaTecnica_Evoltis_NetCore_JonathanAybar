@@ -8,12 +8,8 @@ using System.Threading.Tasks;
 
 namespace Application.Services.Interfaces
 {
-    public interface IUsuarioService
+    public interface IUsuarioService : IServiceBase<UsuarioCreateRequestDto, UsuarioUpdateRequestDto, UsuarioResponseDto, int>
     {
-        Task<UsuarioResponseDto?> GetByIdAsync(int id, CancellationToken ct = default);
-        Task<List<UsuarioResponseDto>> GetAllAsync(CancellationToken ct = default);
-        Task<UsuarioResponseDto> CreateAsync(UsuarioCreateRequestDto request, CancellationToken ct = default);
-        Task<UsuarioResponseDto?> UpdateAsync(int id, UsuarioUpdateRequestDto request, CancellationToken ct = default);
-        Task<bool> DeleteAsync(int id, CancellationToken ct = default);
+        Task<List<UsuarioResponseDto>> SearchAsync(string? nombre, string? provincia, string? ciudad, CancellationToken ct = default);
     }
 }

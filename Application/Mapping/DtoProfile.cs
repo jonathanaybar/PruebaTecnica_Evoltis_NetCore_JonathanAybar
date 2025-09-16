@@ -13,7 +13,7 @@ public class DtoProfile : Profile
         //Response
         CreateMap<Usuario, UsuarioResponseDto>();
         //Requests
-        CreateMap<UsuarioCreateRequestDto, Usuario>();
+        CreateMap<UsuarioCreateRequestDto, Usuario>().ForMember(d => d.FechaCreacion, o => o.MapFrom(_ => DateTime.UtcNow));
         CreateMap<UsuarioUpdateRequestDto, Usuario>();
         #endregion
 
@@ -21,7 +21,7 @@ public class DtoProfile : Profile
         //Response
         CreateMap<Domicilio, DomicilioResponseDto>();
         //Requests
-        CreateMap<DomicilioCreateRequestDto, Domicilio>();
+        CreateMap<DomicilioCreateRequestDto, Domicilio>().ForMember(d => d.FechaCreacion, o => o.MapFrom(_ => DateTime.UtcNow)); ;
         CreateMap<DomicilioUpdateRequestDto, Domicilio>();
         #endregion
     }

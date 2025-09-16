@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.DTOs.Domicilio
 {
-    public record class DomicilioResponseDto
+    public record class DomicilioResponseDto : IHasId<int>
     {
         public int Id { get; init; }
         public int UsuarioId { get; init; }

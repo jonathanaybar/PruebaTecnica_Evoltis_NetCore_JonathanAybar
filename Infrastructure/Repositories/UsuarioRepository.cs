@@ -32,7 +32,7 @@ namespace Infrastructure.Repositories
             if (!string.IsNullOrWhiteSpace(ciudad))
                 q = q.Where(u => u.Domicilios.Any(d => d.Ciudad == ciudad));
 
-            return await q.OrderBy(u => u.Nombre).ToListAsync(ct);
+            return await q.OrderBy(u => u.Nombre).ToListAsync(ct); 
         }
 
 

@@ -1,9 +1,11 @@
-﻿using Infrastructure.Data; 
+﻿using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using WebApi;
+using Infrastructure.Data;
 
 public class CustomWebAppFactory : WebApplicationFactory<Program>
 {
@@ -15,39 +17,31 @@ public class CustomWebAppFactory : WebApplicationFactory<Program>
 
         builder.ConfigureServices(services =>
         {
-            // Quitar el DbContext real (MySQL)
-            var descriptor = services.SingleOrDefault(
-                d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
-            if (descriptor is not null)
-                services.Remove(descriptor);
+            // 1) Quitar cualquier registro previo del contexto real
+            var toRemove = services.Where(d =>
+                    d.ServiceType == typeof(DbContextOptions<AppDbContext>) ||
+                    d.ServiceType == typeof(AppDbContext))
+                .ToList();
+            foreach (var d in toRemove) services.Remove(d);
 
-            // Conexión SQLite en memoria (persistente mientras corre el host)
-            _connection = new SqliteConnection("DataSource=:memory:");
+            // 2) Usar UNA conexión en memoria compartida y mantenerla abierta
+            _connection = new SqliteConnection("DataSource=:memory:;Cache=Shared");
             _connection.Open();
 
-            // Registrar DbContext con SQLite
-            services.AddDbContext<AppDbContext>(options => 
-            {
-                options.UseSqlite(_connection);
-            });
+            services.AddDbContext<AppDbContext>(opts => opts.UseSqlite(_connection));
 
-            // Construir y crear schema
-            var sp = services.BuildServiceProvider();
+            // 3) Crear el esquema desde cero (evita “table already exists”)
+            using var sp = services.BuildServiceProvider();
             using var scope = sp.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             db.Database.EnsureDeleted();
             db.Database.EnsureCreated();
-
         });
     }
 
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
-        if (disposing)
-        {
-            _connection?.Dispose();
-            _connection = null;
-        }
+        _connection?.Dispose();
     }
 }

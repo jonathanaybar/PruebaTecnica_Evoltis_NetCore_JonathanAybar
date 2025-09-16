@@ -1,12 +1,8 @@
-﻿// /WebApi/Controllers/UsuarioController.cs
-using Application.DTOs;
-using Application.DTOs.Usuario;
-using Application.Services.Interfaces; // tu IUsuarioService
+﻿using Application.DTOs.Usuario;
+using Application.Services.Interfaces;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
-[ApiController]
-[Route("api/[controller]")]
 public class UsuarioController
   : BaseController<UsuarioCreateRequestDto, UsuarioUpdateRequestDto, UsuarioResponseDto, int>
 {
@@ -20,6 +16,11 @@ public class UsuarioController
     {
         _usuarioService = usuarioService;
     }
+
+    // GET api/usuario/{id:int}
+    [HttpGet("{id:int}")]
+    public override Task<ActionResult<UsuarioResponseDto>> GetById([FromRoute] int id, CancellationToken ct)
+        => base.GetById(id, ct);
 
     // GET api/usuario/search?nombre=&provincia=&ciudad=
     [HttpGet("search")]

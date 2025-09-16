@@ -14,12 +14,4 @@ public class Usuario : IEntity
     public string Email { get; set; } = string.Empty;
     public DateTime FechaCreacion { get; set; }
     public List<Domicilio> Domicilios { get; set; } = new();
-
-    public void ActualizarEmail(string nuevoEmail)
-    {
-        if (string.IsNullOrWhiteSpace(nuevoEmail))
-            throw new ArgumentException("El email no puede estar vacío.");
-
-        Email = nuevoEmail;
-    }
 }

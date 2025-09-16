@@ -7,22 +7,48 @@ namespace Application.Validations
     {
         public DomicilioCreateValidator()
         {
-            RuleFor(x => x.UsuarioId).GreaterThan(0);
-            RuleFor(x => x.Calle).NotEmpty().MaximumLength(50);
-            RuleFor(x => x.Numero).NotEmpty().MaximumLength(50);
-            RuleFor(x => x.Provincia).NotEmpty().MaximumLength(50);
-            RuleFor(x => x.Ciudad).NotEmpty().MaximumLength(50);
+            RuleFor(x => x.Calle)
+                .NotEmpty().WithMessage("La calle es requerida.")
+                .MaximumLength(50);
+
+            RuleFor(x => x.Numero)
+                .NotEmpty().WithMessage("El número es requerido.")
+                .MaximumLength(50);
+
+            RuleFor(x => x.Provincia)
+                .NotEmpty().WithMessage("La provincia es requerida.")
+                .MaximumLength(50);
+
+            RuleFor(x => x.Ciudad)
+                .NotEmpty().WithMessage("La ciudad es requerida.")
+                .MaximumLength(50);
         }
     }
     public class DomicilioUpdateValidator : AbstractValidator<DomicilioUpdateRequestDto>
     {
         public DomicilioUpdateValidator()
         {
-            RuleFor(x => x.Id).GreaterThan(0);
-            RuleFor(x => x.Calle).NotEmpty().MaximumLength(50);
-            RuleFor(x => x.Numero).NotEmpty().MaximumLength(50);
-            RuleFor(x => x.Provincia).NotEmpty().MaximumLength(50);
-            RuleFor(x => x.Ciudad).NotEmpty().MaximumLength(50);
+            RuleLevelCascadeMode = CascadeMode.Stop;
+
+            RuleFor(x => x.Id)
+            .Must(id => id > 0)
+            .WithMessage("El Id del domicilio debe ser mayor a 0 cuando se especifica.");
+
+            RuleFor(x => x.Calle)
+                .NotEmpty().WithMessage("La calle es requerida.")
+                .MaximumLength(50);
+
+            RuleFor(x => x.Numero)
+                .NotEmpty().WithMessage("El número es requerido.")
+                .MaximumLength(50);
+
+            RuleFor(x => x.Provincia)
+                .NotEmpty().WithMessage("La provincia es requerida.")
+                .MaximumLength(50);
+
+            RuleFor(x => x.Ciudad)
+                .NotEmpty().WithMessage("La ciudad es requerida.")
+                .MaximumLength(50);
         }
     }
 }

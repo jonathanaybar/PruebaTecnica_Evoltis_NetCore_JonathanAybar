@@ -15,8 +15,8 @@ namespace Infrastructure.Data
         {
         }
 
-        public virtual DbSet<Domicilio> domicilios { get; set; } = null!;
-        public virtual DbSet<Usuario> usuarios { get; set; } = null!;
+        public virtual DbSet<Domicilio> Domicilio { get; set; } = null!;
+        public virtual DbSet<Usuario> Usuario { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

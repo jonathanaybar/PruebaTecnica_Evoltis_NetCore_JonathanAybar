@@ -1,5 +1,5 @@
-﻿using Application.DTOs;
-using Application.Services;
+﻿using Application.DTOs;            // IHasId<TKey>
+using Application.Services;        // IServiceBase<,,,>
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,18 +22,7 @@ public class BaseController<TCreate, TUpdate, TRead, TKey> : ControllerBase
         _updateValidator = updateValidator;
     }
 
-    [HttpPost]
-    public virtual async Task<ActionResult<TRead>> Create([FromBody] TCreate dto, CancellationToken ct)
-    {
-        if (_createValidator is not null)
-        {
-            var v = await _createValidator.ValidateAsync(dto, ct);
-        }
-
-        var created = await _service.CreateAsync(dto, ct);
-        return CreatedAtRoute(nameof(GetById), new { id = created.Id }, created);
-    }
-
+    // GET api/[controller]/{id}
     [HttpGet("{id}")]
     public virtual async Task<ActionResult<TRead>> GetById([FromRoute] TKey id, CancellationToken ct)
     {
@@ -41,6 +30,7 @@ public class BaseController<TCreate, TUpdate, TRead, TKey> : ControllerBase
         return r is null ? NotFound() : Ok(r);
     }
 
+    // GET api/[controller]
     [HttpGet]
     public virtual async Task<ActionResult<List<TRead>>> GetAll(CancellationToken ct)
     {
@@ -48,18 +38,45 @@ public class BaseController<TCreate, TUpdate, TRead, TKey> : ControllerBase
         return Ok(items);
     }
 
+    // POST api/[controller]
+    [HttpPost]
+    public virtual async Task<ActionResult<TRead>> Create([FromBody] TCreate dto, CancellationToken ct)
+    {
+        if (_createValidator is not null)
+        {
+            var v = await _createValidator.ValidateAsync(dto, ct);
+            if (!v.IsValid)
+            {
+                var pd = new ValidationProblemDetails();
+                foreach (var kv in v.ToDictionary()) pd.Errors.Add(kv.Key, kv.Value);
+                return ValidationProblem(pd);
+            }
+        }
+
+        var created = await _service.CreateAsync(dto, ct);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+    }
+
+    // PUT api/[controller]/{id}
     [HttpPut("{id}")]
     public virtual async Task<ActionResult<TRead>> Update([FromRoute] TKey id, [FromBody] TUpdate dto, CancellationToken ct)
     {
         if (_updateValidator is not null)
         {
             var v = await _updateValidator.ValidateAsync(dto, ct);
+            if (!v.IsValid)
+            {
+                var pd = new ValidationProblemDetails();
+                foreach (var kv in v.ToDictionary()) pd.Errors.Add(kv.Key, kv.Value);
+                return ValidationProblem(pd);
+            }
         }
 
         var r = await _service.UpdateAsync(id, dto, ct);
         return r is null ? NotFound() : Ok(r);
     }
 
+    // DELETE api/[controller]/{id}
     [HttpDelete("{id}")]
     public virtual async Task<IActionResult> Delete([FromRoute] TKey id, CancellationToken ct)
     {

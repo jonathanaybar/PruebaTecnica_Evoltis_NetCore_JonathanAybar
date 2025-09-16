@@ -15,14 +15,14 @@ namespace Application.DTOs.Usuario
         public List<Domicilio.DomicilioCreateRequestDto>? Domicilios { get; init; }
     }
 
-    public record class UsuarioUpdateRequestDto : IHasId<int>
+    public record class UsuarioUpdateRequestDto
     {
-        public int Id { get; init; }
+        public int? Id { get; init; }
         public string Nombre { get; init; } = string.Empty;
         public string Email { get; init; } = string.Empty;
 
         // Para reemplazar/agregar domicilios del usuario
-        public List<Domicilio.DomicilioCreateRequestDto>? Domicilios { get; init; }
+        public List<Domicilio.DomicilioUpdateRequestDto>? Domicilios { get; init; }
     }
 
     public record class UsuarioSearchRequestDto

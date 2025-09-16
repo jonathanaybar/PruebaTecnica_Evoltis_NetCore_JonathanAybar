@@ -36,7 +36,16 @@ builder.Services.AddAutoMapper(
     typeof(PersistenceProfile).Assembly
 );
 
+
 var app = builder.Build();
+
+//Automigrar al arrancar
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
+
 if (app.Environment.IsDevelopment()) { app.UseSwagger(); app.UseSwaggerUI(); }
 app.UseHttpsRedirection();
 app.UseAuthorization();

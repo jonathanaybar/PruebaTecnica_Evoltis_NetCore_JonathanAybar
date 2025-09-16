@@ -15,7 +15,7 @@ namespace Application.DTOs.Domicilio
         public string Ciudad { get; init; } = string.Empty;
     }
 
-    public record class DomicilioUpdateRequestDto : IHasId<int>
+    public record class DomicilioUpdateRequestDto
     {
         public int Id { get; init; }
         public int UsuarioId { get; init; }

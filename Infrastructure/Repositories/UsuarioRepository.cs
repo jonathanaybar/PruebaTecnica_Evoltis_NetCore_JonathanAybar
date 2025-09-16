@@ -18,8 +18,9 @@ namespace Infrastructure.Repositories
 
         public async Task<List<Usuario>> Search(string? nombre, string? provincia, string? ciudad, CancellationToken ct = default)
         {
-            var q = _ctx.usuarios
+            var q = _ctx.Set<Usuario>()                 
                 .Include(u => u.Domicilios)
+                .AsNoTracking()                         
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(nombre))
@@ -33,6 +34,7 @@ namespace Infrastructure.Repositories
 
             return await q.OrderBy(u => u.Nombre).ToListAsync(ct);
         }
+
 
     }
 }

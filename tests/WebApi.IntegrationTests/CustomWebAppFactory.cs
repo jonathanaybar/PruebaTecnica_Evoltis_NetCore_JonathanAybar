@@ -11,32 +11,33 @@ public class CustomWebAppFactory : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseEnvironment("Testing");
+
         builder.ConfigureServices(services =>
         {
-            // 1) Quitar el DbContext real (MySQL)
+            // Quitar el DbContext real (MySQL)
             var descriptor = services.SingleOrDefault(
-                d => d.ServiceType == typeof(DbContextOptions<AppDbContext>)); // <-- AJUSTAR el DbContext
+                d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
             if (descriptor is not null)
                 services.Remove(descriptor);
 
-            // 2) Conexión SQLite en memoria (persistente mientras corre el host)
+            // Conexión SQLite en memoria (persistente mientras corre el host)
             _connection = new SqliteConnection("DataSource=:memory:");
             _connection.Open();
 
-            // 3) Registrar DbContext con SQLite
-            services.AddDbContext<AppDbContext>(options =>   // <-- AJUSTAR el DbContext
+            // Registrar DbContext con SQLite
+            services.AddDbContext<AppDbContext>(options => 
             {
                 options.UseSqlite(_connection);
             });
 
-            // 4) Construir y crear schema
+            // Construir y crear schema
             var sp = services.BuildServiceProvider();
             using var scope = sp.CreateScope();
-            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>(); // <-- AJUSTAR
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            db.Database.EnsureDeleted();
             db.Database.EnsureCreated();
 
-            // 5) (Opcional) Seed
-            // Seed(db);
         });
     }
 

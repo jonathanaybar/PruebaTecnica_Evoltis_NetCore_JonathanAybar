@@ -25,7 +25,7 @@ public class DomicilioConfig : IEntityTypeConfiguration<domicilio>
         entity.Property(e => e.Ciudad).HasMaxLength(50);
 
         entity.Property(e => e.FechaCreacion)
-              .HasDefaultValueSql("current_timestamp()");
+              .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         entity.Navigation(u => u.Usuario).AutoInclude();
     }

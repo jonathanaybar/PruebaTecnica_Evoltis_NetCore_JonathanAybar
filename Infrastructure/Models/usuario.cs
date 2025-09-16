@@ -15,13 +15,11 @@ namespace Infrastructure.Models
         }
 
         [Key]
-        [Column(TypeName = "int(11)")]
         public int Id { get; set; }
         [StringLength(50)]
         public string? Nombre { get; set; }
         [StringLength(50)]
         public string? Email { get; set; }
-        [Column(TypeName = "datetime")]
         public DateTime FechaCreacion { get; set; }
 
         [InverseProperty("Usuario")]

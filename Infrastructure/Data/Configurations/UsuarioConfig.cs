@@ -14,15 +14,14 @@ public class UsuarioConfig : IEntityTypeConfiguration<usuario>
         entity.ToTable("usuario");
 
         entity.HasKey(e => e.Id);
-
         entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
-        entity.Property(e => e.Nombre).HasMaxLength(50).HasDefaultValueSql("''");
+        entity.Property(e => e.Nombre).HasMaxLength(50);
 
-        entity.Property(e => e.Email).HasMaxLength(50).HasDefaultValueSql("''");
+        entity.Property(e => e.Email).HasMaxLength(50);
 
         entity.Property(e => e.FechaCreacion)
-              .HasDefaultValueSql("current_timestamp()");
+              .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         entity.HasMany(e => e.domicilios)
         .WithOne(d => d.Usuario!)

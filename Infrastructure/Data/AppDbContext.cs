@@ -1,5 +1,6 @@
 ﻿//using Infrastructure.Models;
 using Domain.Entities;
+using Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data
@@ -15,8 +16,8 @@ namespace Infrastructure.Data
         {
         }
 
-        public virtual DbSet<Domicilio> Domicilio { get; set; } = null!;
-        public virtual DbSet<Usuario> Usuario { get; set; } = null!;
+        public virtual DbSet<domicilio> Domicilio { get; set; } = null!;
+        public virtual DbSet<usuario> Usuario { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -28,8 +29,8 @@ namespace Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
             base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

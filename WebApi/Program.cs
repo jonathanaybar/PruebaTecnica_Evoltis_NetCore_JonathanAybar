@@ -9,6 +9,7 @@ using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Extensions;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Controllers + JSON
@@ -51,3 +52,5 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
+
+public partial class Program { }

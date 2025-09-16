@@ -12,7 +12,7 @@ public class DomicilioConfig : IEntityTypeConfiguration<domicilio>
 
         entity.HasKey(x => x.Id);
 
-        entity.Property(x => x.Id).HasColumnType("int(11)");
+        entity.Property(x => x.Id).ValueGeneratedOnAdd();
 
         entity.Property(x => x.UsuarioID).HasColumnName("UsuarioID").HasColumnType("int(11)");
 
@@ -25,8 +25,6 @@ public class DomicilioConfig : IEntityTypeConfiguration<domicilio>
         entity.Property(e => e.Ciudad).HasMaxLength(50);
 
         entity.Property(e => e.FechaCreacion)
-              .HasColumnType("datetime")
-              .ValueGeneratedOnAdd()
               .HasDefaultValueSql("current_timestamp()");
 
         entity.Navigation(u => u.Usuario).AutoInclude();

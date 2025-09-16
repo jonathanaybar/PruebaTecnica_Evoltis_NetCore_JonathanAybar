@@ -15,15 +15,13 @@ public class UsuarioConfig : IEntityTypeConfiguration<usuario>
 
         entity.HasKey(e => e.Id);
 
-        entity.Property(e => e.Id).HasColumnType("int(11)");
+        entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
         entity.Property(e => e.Nombre).HasMaxLength(50).HasDefaultValueSql("''");
 
         entity.Property(e => e.Email).HasMaxLength(50).HasDefaultValueSql("''");
 
         entity.Property(e => e.FechaCreacion)
-              .HasColumnType("datetime")
-              .ValueGeneratedOnAdd()
               .HasDefaultValueSql("current_timestamp()");
 
         entity.HasMany(e => e.domicilios)
